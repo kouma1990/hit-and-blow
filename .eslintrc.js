@@ -19,5 +19,7 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
+    'prettier/prettier': ['error', { 'semi': false, 'printWidth': 200 }],
+    'max-len': ['error', {'code': 200, 'ignoreUrls': true}]
   }
 }

@@ -4,25 +4,19 @@
       <v-card>
         <div v-if="room">
           <div>
-            {{ user }}
             {{ room.id }}
+            {{ user }}
             {{ room.status }}
             {{ number }}<br />
             {{ room.number1 }}
             {{ room.number2 }}
-            {{ room.guess1 }}
-            {{ room.guess2 }}
           </div>
           <div>
             <v-btn
               v-for="(_, idx) in 10"
               :key="'number-key-' + idx"
               color="indigo"
-              :disabled="
-                number.length > 3 ||
-                  number.includes(idx) ||
-                  !room.status.includes(user)
-              "
+              :disabled="number.length > 3 || number.includes(idx) || !room.status.includes(user)"
               @click="addNumber(String(idx))"
             >
               {{ idx }}
@@ -30,12 +24,7 @@
           </div>
           <div>
             <v-btn color="indigo" @click="deleteNumber">back</v-btn>
-            <v-btn
-              color="indigo"
-              :disabled="number.length !== 4 || !room.status.includes(user)"
-              @click="send"
-              >send</v-btn
-            >
+            <v-btn color="indigo" :disabled="number.length !== 4 || !room.status.includes(user)" @click="send">send</v-btn>
 
             <v-btn @click="user = 1">1</v-btn>
             <v-btn @click="user = 2">2</v-btn>
@@ -48,17 +37,17 @@
             </v-btn>
           </v-card-actions>
           <v-card-actions>
-            <v-text-field
-              v-model="joinId"
-              label="Outlined"
-              outlined
-            ></v-text-field>
+            <v-text-field v-model="joinId" label="Outlined" outlined></v-text-field>
             <v-btn color="primary" @click="joinRoom">
               参加
             </v-btn>
           </v-card-actions>
         </div>
       </v-card>
+      <v-row v-if="room">
+        <guess-list :key="'guess1'" :guess-list="room.guess1" />
+        <guess-list :key="'guess2'" :guess-list="room.guess2" />
+      </v-row>
     </v-flex>
   </v-layout>
 </template>
@@ -69,8 +58,12 @@
 import { mapGetters } from 'vuex'
 import firebase from 'firebase'
 import { db } from '~/plugins/firebase.js'
+import GuessList from '~/components/GuessList.vue'
 
 export default {
+  components: {
+    GuessList
+  },
   data() {
     return {
       user: 0,
@@ -94,25 +87,26 @@ export default {
         return null
       }
 
+      const number = this.number
+      this.number = ''
+
       if (this.room.status === 'select1') {
-        this.updateRoom({ status: 'select2', number1: this.number })
+        return this.updateRoom({ status: 'select2', number1: number })
       }
       if (this.room.status === 'select2') {
-        this.updateRoom({ status: 'guess1', number2: this.number })
+        return this.updateRoom({ status: 'guess1', number2: number })
       }
 
       // guess
+      const judgement = [2, 2]
+      this.guess.push({ number, judgement })
       if (this.room.status === 'guess1') {
-        this.guess.push(this.number)
-        this.updateRoom({ status: 'guess2', guess1: this.guess })
+        return this.updateRoom({ status: 'guess2', guess1: this.guess })
       }
 
       if (this.room.status === 'guess2') {
-        this.guess.push(this.number)
-        this.updateRoom({ status: 'guess1', guess2: this.guess })
+        return this.updateRoom({ status: 'guess1', guess2: this.guess })
       }
-
-      this.number = ''
     },
     createRoom() {
       const id = this.getUniqueStr()
@@ -127,10 +121,7 @@ export default {
       this.user = 1
     },
     async joinRoom() {
-      await this.$store.dispatch(
-        'room/setRoomRef',
-        db.collection('rooms').doc(this.joinId)
-      )
+      await this.$store.dispatch('room/setRoomRef', db.collection('rooms').doc(this.joinId))
 
       if (this.room.status === 'waiting') {
         this.updateRoom({ status: 'select1' })
