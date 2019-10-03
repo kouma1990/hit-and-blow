@@ -6,7 +6,7 @@ export const state = () => ({
 
 export const actions = {
   setRoomRef: firestoreAction(({ bindFirestoreRef }, ref) => {
-    bindFirestoreRef('room', ref)
+    return bindFirestoreRef('room', ref)
   })
 }
 
