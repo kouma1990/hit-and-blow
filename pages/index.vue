@@ -4,12 +4,15 @@
       <v-card>
         <div v-if="room">
           <div>
-            {{ room.id }}
-            {{ user }}
-            {{ room.status }}
-            {{ number }}<br />
-            {{ room.number1 }}
-            {{ room.number2 }}
+            部屋ID：{{ room.id }} <br />
+            あなたはプレイヤー{{ user }}です。<br />
+            <div class="">
+              あなたの設定ナンバー：
+              {{ user === 1 ? room.number1 : room.number2 }}
+            </div>
+
+            <div v-if="room.status.includes('select') && room.status.slice(-1) !== String(user)">相手がナンバーを設定中です。</div>
+            <div v-if="room.status.includes('guess') && room.status.slice(-1) !== String(user)">相手がナンバーを予想中です。</div>
           </div>
           <div>
             <v-btn
@@ -29,15 +32,16 @@
             <v-btn @click="user = 1">1</v-btn>
             <v-btn @click="user = 2">2</v-btn>
           </div>
+          <div>入力中： {{ number }}</div>
         </div>
         <div v-else>
           <v-card-actions>
-            <v-btn color="primary" @click="createRoom">
+            <v-btn color="primary" class="mt-5" @click="createRoom">
               部屋作成
             </v-btn>
           </v-card-actions>
           <v-card-actions>
-            <v-text-field v-model="joinId" label="Outlined" outlined></v-text-field>
+            <v-text-field v-model="joinId" class="pt-6 mr-2" label="部屋ID" dense outlined></v-text-field>
             <v-btn color="primary" @click="joinRoom">
               参加
             </v-btn>
@@ -45,8 +49,18 @@
         </div>
       </v-card>
       <v-row v-if="room">
-        <guess-list :key-name="'guess1'" :guess-list="room.guess1" />
-        <guess-list :key-name="'guess2'" :guess-list="room.guess2" />
+        <v-col>
+          <v-card>
+            <v-card-title>プレイヤー1の予想</v-card-title>
+            <guess-list :key-name="'guess1'" :guess-list="room.guess1" />
+          </v-card>
+        </v-col>
+        <v-col>
+          <v-card>
+            <v-card-title>プレイヤー2の予想</v-card-title>
+            <guess-list :key-name="'guess2'" :guess-list="room.guess2" />
+          </v-card>
+        </v-col>
       </v-row>
     </v-flex>
   </v-layout>

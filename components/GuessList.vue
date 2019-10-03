@@ -1,14 +1,10 @@
 <template>
-  <v-col>
-    <v-card>
-      <v-list dense>
-        <v-list-item v-for="(guess, idx) in guessList" :key="keyName + '-' + idx">
-          <v-list-item-content>{{ guess.number }}</v-list-item-content>
-          <v-list-item-content> {{ guess.judgement[0] }} Hit {{ guess.judgement[1] }} blow </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-card>
-  </v-col>
+  <v-list dense :elevation="0">
+    <v-list-item v-for="(guess, idx) in guessList" :key="keyName + '-' + idx">
+      <v-list-item-content>{{ guess.number }}</v-list-item-content>
+      <v-list-item-content> {{ guess.judgement[0] }} Hit {{ guess.judgement[1] }} blow </v-list-item-content>
+    </v-list-item>
+  </v-list>
 </template>
 
 <script>
