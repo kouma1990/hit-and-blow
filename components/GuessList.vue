@@ -2,7 +2,7 @@
   <v-col>
     <v-card>
       <v-list dense>
-        <v-list-item v-for="(guess, idx) in guessList" :key="key + '-' + idx">
+        <v-list-item v-for="(guess, idx) in guessList" :key="keyName + '-' + idx">
           <v-list-item-content>{{ guess.number }}</v-list-item-content>
           <v-list-item-content> {{ guess.judgement[0] }} Hit {{ guess.judgement[1] }} blow </v-list-item-content>
         </v-list-item>
@@ -20,7 +20,7 @@ export default {
         return []
       }
     },
-    key: {
+    keyName: {
       type: String,
       default: 'guess'
     }

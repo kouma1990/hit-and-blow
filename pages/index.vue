@@ -45,8 +45,8 @@
         </div>
       </v-card>
       <v-row v-if="room">
-        <guess-list :key="'guess1'" :guess-list="room.guess1" />
-        <guess-list :key="'guess2'" :guess-list="room.guess2" />
+        <guess-list :key-name="'guess1'" :guess-list="room.guess1" />
+        <guess-list :key-name="'guess2'" :guess-list="room.guess2" />
       </v-row>
     </v-flex>
   </v-layout>
@@ -98,15 +98,29 @@ export default {
       }
 
       // guess
-      const judgement = [2, 2]
-      this.guess.push({ number, judgement })
       if (this.room.status === 'guess1') {
+        const judgement = this.judge(this.room.number2, number)
+        this.guess.push({ number, judgement })
         return this.updateRoom({ status: 'guess2', guess1: this.guess })
       }
 
       if (this.room.status === 'guess2') {
+        const judgement = this.judge(this.room.number1, number)
+        this.guess.push({ number, judgement })
         return this.updateRoom({ status: 'guess1', guess2: this.guess })
       }
+    },
+    judge(num1, num2) {
+      let hit = 0
+      let blow = 0
+      for (let i = 0; i < 4; i++) {
+        if (i === num1.indexOf(num2[i])) {
+          hit += 1
+        } else if (num1.includes(num2[i])) {
+          blow += 1
+        }
+      }
+      return [hit, blow]
     },
     createRoom() {
       const id = this.getUniqueStr()
