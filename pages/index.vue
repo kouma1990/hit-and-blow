@@ -4,17 +4,25 @@
       <v-card>
         <div v-if="room">
           <div>
+            {{ user }}
             {{ room.id }}
             {{ room.status }}
-            {{ room.status == 'waiting' }}
-            {{ number }}
+            {{ number }}<br />
+            {{ room.number1 }}
+            {{ room.number2 }}
+            {{ room.guess1 }}
+            {{ room.guess2 }}
           </div>
           <div>
             <v-btn
               v-for="(_, idx) in 10"
               :key="'number-key-' + idx"
               color="indigo"
-              :disabled="number.length > 3 || number.includes(idx)"
+              :disabled="
+                number.length > 3 ||
+                  number.includes(idx) ||
+                  !room.status.includes(user)
+              "
               @click="addNumber(String(idx))"
             >
               {{ idx }}
@@ -22,9 +30,15 @@
           </div>
           <div>
             <v-btn color="indigo" @click="deleteNumber">back</v-btn>
-            <v-btn color="indigo" :disabled="number.length !== 4" @click="send"
+            <v-btn
+              color="indigo"
+              :disabled="number.length !== 4 || !room.status.includes(user)"
+              @click="send"
               >send</v-btn
             >
+
+            <v-btn @click="user = 1">1</v-btn>
+            <v-btn @click="user = 2">2</v-btn>
           </div>
         </div>
         <div v-else>
@@ -61,7 +75,8 @@ export default {
     return {
       user: 0,
       joinId: '',
-      number: ''
+      number: '',
+      guess: []
     }
   },
   computed: {
@@ -78,6 +93,26 @@ export default {
       if (this.number.length !== 4) {
         return null
       }
+
+      if (this.room.status === 'select1') {
+        this.updateRoom({ status: 'select2', number1: this.number })
+      }
+      if (this.room.status === 'select2') {
+        this.updateRoom({ status: 'guess1', number2: this.number })
+      }
+
+      // guess
+      if (this.room.status === 'guess1') {
+        this.guess.push(this.number)
+        this.updateRoom({ status: 'guess2', guess1: this.guess })
+      }
+
+      if (this.room.status === 'guess2') {
+        this.guess.push(this.number)
+        this.updateRoom({ status: 'guess1', guess2: this.guess })
+      }
+
+      this.number = ''
     },
     createRoom() {
       const id = this.getUniqueStr()
@@ -98,9 +133,8 @@ export default {
       )
 
       if (this.room.status === 'waiting') {
-        db.collection('rooms')
-          .doc(this.room.id)
-          .update({ status: 'start' })
+        this.updateRoom({ status: 'select1' })
+        this.user = 2
       }
     },
     getUniqueStr() {
@@ -108,6 +142,11 @@ export default {
       const randStr = Math.floor(strong * Math.random()).toString(16)
       const id = new Date().getTime().toString(16) + randStr
       return id
+    },
+    updateRoom(data) {
+      db.collection('rooms')
+        .doc(this.room.id)
+        .update(data)
     }
   }
 }
