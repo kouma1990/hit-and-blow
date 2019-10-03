@@ -28,9 +28,10 @@
           <div>
             <v-btn color="indigo" @click="deleteNumber">back</v-btn>
             <v-btn color="indigo" :disabled="number.length !== 4 || !room.status.includes(user)" @click="send">send</v-btn>
-
+            <!--
             <v-btn @click="user = 1">1</v-btn>
             <v-btn @click="user = 2">2</v-btn>
+            -->
           </div>
           <div>入力中： {{ number }}</div>
         </div>
