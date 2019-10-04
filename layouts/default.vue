@@ -24,3 +24,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.v-application {
+  font-family: 'mamelon' !important;
+}
+</style>
