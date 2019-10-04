@@ -1,16 +1,10 @@
 <template>
   <v-app dark>
-    <v-app-bar :clipped-left="clipped" fixed app>
-      <v-toolbar-title v-text="title" />
-    </v-app-bar>
     <v-content>
       <v-container>
         <nuxt />
       </v-container>
     </v-content>
-    <v-footer :fixed="fixed" app>
-      <span>&copy; 2019</span>
-    </v-footer>
   </v-app>
 </template>
 
@@ -26,7 +20,8 @@ export default {
 </script>
 
 <style lang="scss">
-.v-application {
+.v-application,
+.v-application .headline {
   font-family: 'mamelon' !important;
 }
 </style>

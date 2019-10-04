@@ -1,54 +1,55 @@
 <template>
   <v-layout column justify-center align-center>
     <v-flex xs12 sm8 md6>
-      <v-card>
-        <div v-if="room">
-          <div>
-            部屋ID：{{ room.id }} <br />
-            あなたはプレイヤー{{ user }}です。<br />
-            <div class="">
-              あなたの設定ナンバー：
-              {{ user === 1 ? room.number1 : room.number2 }}
-            </div>
+      <div v-if="room">
+        <div>
+          部屋ID：{{ room.id }} <br />
+          <div :class="'c' + user + '--text'" class="headline text-center mt-6">あなたはプレイヤー{{ user }}です</div>
+          <v-alert :color="'c' + user" dense style="border-radius: 25px" class="headline text-center mt-6">出題ラウンド</v-alert>
+          <div class="">
+            あなたの設定ナンバー： {{ enemy }}
+            {{ user === 1 ? room.number1 : room.number2 }}
+          </div>
 
-            <div v-if="room.status.includes('select') && room.status.slice(-1) !== String(user)">相手がナンバーを設定中です。</div>
-            <div v-if="room.status.includes('guess') && room.status.slice(-1) !== String(user)">相手がナンバーを予想中です。</div>
-          </div>
-          <div>
-            <v-btn
-              v-for="(_, idx) in 10"
-              :key="'number-key-' + idx"
-              color="indigo"
-              :disabled="number.length > 3 || number.includes(idx) || !room.status.includes(user)"
-              @click="addNumber(String(idx))"
-            >
-              {{ idx }}
-            </v-btn>
-          </div>
-          <div>
-            <v-btn color="indigo" @click="deleteNumber">back</v-btn>
-            <v-btn color="indigo" :disabled="number.length !== 4 || !room.status.includes(user)" @click="send">send</v-btn>
-            <!--
-            <v-btn @click="user = 1">1</v-btn>
-            <v-btn @click="user = 2">2</v-btn>
-            -->
-          </div>
-          <div>入力中： {{ number }}</div>
+          <div v-if="room.status.includes('select') && room.status.slice(-1) !== String(user)">相手がナンバーを設定中です。</div>
+          <div v-if="room.status.includes('guess') && room.status.slice(-1) !== String(user)">相手がナンバーを予想中です。</div>
         </div>
-        <div v-else>
-          <v-card-actions>
-            <v-btn color="primary" class="mt-5" @click="createRoom">
-              部屋作成
-            </v-btn>
-          </v-card-actions>
-          <v-card-actions>
-            <v-text-field v-model="joinId" class="pt-6 mr-2" label="部屋ID" dense outlined></v-text-field>
-            <v-btn color="primary" @click="joinRoom">
-              参加
-            </v-btn>
-          </v-card-actions>
+        <div>
+          <v-btn
+            v-for="(_, idx) in 10"
+            :key="'number-key-' + idx"
+            class="mx-2 subtitle-1"
+            :color="'c' + user"
+            fab
+            small
+            :disabled="number.length > 3 || number.includes(idx) || !room.status.includes(user)"
+            @click="addNumber(String(idx))"
+          >
+            {{ idx }}
+          </v-btn>
         </div>
-      </v-card>
+        <div>
+          <v-btn color="indigo" @click="deleteNumber">back</v-btn>
+          <v-btn color="indigo" :disabled="number.length !== 4 || !room.status.includes(user)" @click="send">send</v-btn>
+
+          <v-btn @click="user = 1">1</v-btn>
+          <v-btn @click="user = 2">2</v-btn>
+        </div>
+        <div>入力中： {{ number }}</div>
+      </div>
+      <div v-else>
+        <v-card-actions>
+          <v-btn color="primary" class="mt-5" @click="createRoom">
+            部屋作成
+          </v-btn>
+        </v-card-actions>
+        <v-card-actions>
+          <v-text-field v-model="joinId" class="pt-6 mr-2" label="部屋ID" dense outlined></v-text-field>
+          <v-btn color="primary" @click="joinRoom">
+            参加
+          </v-btn>
+        </v-card-actions>
+      </div>
       <v-row v-if="room">
         <v-col>
           <v-card>
@@ -88,7 +89,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ room: 'room/getRoom' })
+    ...mapGetters({ room: 'room/getRoom' }),
+    enemy() {
+      return 3 - this.user
+    }
   },
   methods: {
     addNumber(num) {
